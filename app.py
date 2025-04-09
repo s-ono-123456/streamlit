@@ -1,8 +1,9 @@
 import streamlit as st
 import requests
 from typing import List
-import faiss
 import numpy as np
+from faiss_utils import build_faiss_index, search
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 # 検索用データの準備（例: ダミーデータ）
 data = [
@@ -12,24 +13,14 @@ data = [
     "Streamlitを使ったアプリケーション開発。"
 ]
 
+# TF-IDFベクトライザの初期化
+tfidf_vectorizer = TfidfVectorizer()
+
+# データを使ってTF-IDFベクトライザを学習
+data_vectors = tfidf_vectorizer.fit_transform(data).toarray()
+
 # FAISSインデックスの構築
-def build_faiss_index(data: List[str]):
-    dimension = 512  # ベクトルの次元数（仮定）
-    index = faiss.IndexFlatL2(dimension)
-    # ダミーのベクトルを生成（実際には埋め込みモデルを使用）
-    vectors = np.random.rand(len(data), dimension).astype('float32')
-    index.add(vectors)
-    return index, vectors
-
-index, vectors = build_faiss_index(data)
-
-# 検索関数
-def search(query: str, top_k: int = 3):
-    # クエリをベクトル化（ダミーのベクトルを使用）
-    query_vector = np.random.rand(1, vectors.shape[1]).astype('float32')
-    distances, indices = index.search(query_vector, top_k)
-    results = [data[i] for i in indices[0]]
-    return results
+index, _ = build_faiss_index(data_vectors.tolist(), dimension=data_vectors.shape[1])
 
 # LLM API呼び出し関数
 def call_llm_api(prompt: str) -> str:
@@ -47,7 +38,9 @@ st.title("RAG実装デモ")
 query = st.text_input("質問を入力してください:")
 if query:
     st.write("検索中...")
-    search_results = search(query)
+    # クエリをTF-IDFでベクトル化
+    query_vector = tfidf_vectorizer.transform([query]).toarray().astype('float32')
+    search_results = search(index, query_vector, data)
     st.write("検索結果:", search_results)
 
     # 検索結果をプロンプトに含めてLLMに送信

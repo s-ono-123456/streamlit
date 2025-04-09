@@ -1,0 +1,7 @@
+flask
+streamlit
+transformers
+faiss-cpu
+numpy
+requests
+scikit-learn

@@ -1,13 +1,22 @@
 from flask import Flask, request, jsonify
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 app = Flask(__name__)
 
-# gemma-2-2b-jpn-itモデルのロード（ダミーの例）
+# gemma-2-2b-jpn-itモデルのロード（ダミー実装）
 def load_model():
-    # 実際にはモデルをロードするコードを記述
-    return "gemma-2-2b-jpn-itモデル"
+    # ダミーのモデルとトークナイザーを返す
+    class DummyModel:
+        def __init__(self):
+            pass
 
-model = load_model()
+    class DummyTokenizer:
+        def __init__(self):
+            pass
+
+    return DummyModel(), DummyTokenizer()
+
+model, tokenizer = load_model()
 
 # 推論関数（ダミーの例）
 def generate_response(prompt):
