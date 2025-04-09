@@ -4,14 +4,12 @@ from typing import List
 import numpy as np
 from faiss_utils import build_faiss_index, search
 from sklearn.feature_extraction.text import TfidfVectorizer
+import pandas as pd
+from data_utils import load_data_from_csv
 
-# 検索用データの準備（例: ダミーデータ）
-data = [
-    "これはサンプルデータです。",
-    "RAGの実装例について説明します。",
-    "gemma-2-2b-jpn-itモデルを使用します。",
-    "Streamlitを使ったアプリケーション開発。"
-]
+# 検索用データの準備
+csv_file_path = "data.csv"  # CSVファイルのパス
+data = load_data_from_csv(csv_file_path)
 
 # TF-IDFベクトライザの初期化
 tfidf_vectorizer = TfidfVectorizer()
