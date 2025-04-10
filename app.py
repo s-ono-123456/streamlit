@@ -3,7 +3,7 @@ import requests
 from typing import List
 import numpy as np
 from faiss_utils import build_faiss_index, search
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sentence_transformers import SentenceTransformer
 import pandas as pd
 from data_utils import load_data_from_csv
 
@@ -11,11 +11,11 @@ from data_utils import load_data_from_csv
 csv_file_path = "data.csv"  # CSVファイルのパス
 data = load_data_from_csv(csv_file_path)
 
-# TF-IDFベクトライザの初期化
-tfidf_vectorizer = TfidfVectorizer()
+# all-minilm-L6-v2モデルの初期化
+model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
-# データを使ってTF-IDFベクトライザを学習
-data_vectors = tfidf_vectorizer.fit_transform(data).toarray()
+# データを使ってベクトル化
+data_vectors = model.encode(data)
 
 # FAISSインデックスの構築
 index, _ = build_faiss_index(data_vectors.tolist(), dimension=data_vectors.shape[1])
@@ -36,8 +36,8 @@ st.title("RAG実装デモ")
 query = st.text_input("質問を入力してください:")
 if query:
     st.write("検索中...")
-    # クエリをTF-IDFでベクトル化
-    query_vector = tfidf_vectorizer.transform([query]).toarray().astype('float32')
+    # クエリをベクトル化
+    query_vector = model.encode([query]).astype('float32')
     search_results = search(index, query_vector, data)
     st.write("検索結果:", search_results)
 

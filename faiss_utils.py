@@ -2,7 +2,7 @@ import faiss
 import numpy as np
 from typing import List
 
-def build_faiss_index(data: List[str], dimension: int = 512):
+def build_faiss_index(data: List[str], dimension: int = 384):
     """
     FAISSインデックスを構築します。
 
@@ -15,8 +15,8 @@ def build_faiss_index(data: List[str], dimension: int = 512):
         vectors: データに対応するベクトル。
     """
     index = faiss.IndexFlatL2(dimension)
-    # 現在はランダムなベクトルを生成しています。実際のデータに基づくベクトル化処理に置き換える必要があります。
-    vectors = np.random.rand(len(data), dimension).astype('float32')
+    # all-MiniLM-L6-v2モデルでエンコードされたベクトルを使用します。
+    vectors = np.array(data, dtype='float32')
     index.add(vectors)
     return index, vectors
 
