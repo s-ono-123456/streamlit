@@ -1,2 +1,5 @@
 # venvフォルダを無視
 venv/
+
+# pyenvの仮想環境を無視
+__pycache__/
