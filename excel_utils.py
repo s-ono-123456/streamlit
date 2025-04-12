@@ -106,7 +106,7 @@ def extract_tables_from_excel(file_path: str) -> dict:
                         current_table = []
                     else:
                         # 表ではない地の文として扱う
-                        markdown_output.append(" ".join([str(cell.value) if cell.value else "" for cell in row]))
+                        markdown_output.append("".join([str(cell.value) if cell.value else "" for cell in row]))
 
             # 最後の表を追加
             if current_table:
