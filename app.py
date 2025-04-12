@@ -14,7 +14,7 @@ index = faiss.read_index("output/faiss_index.bin")
 with open("output/data.pkl", "rb") as f:
     data = pickle.load(f)
 
-# all-minilm-L6-v2モデルの初期化
+# GLuCoSE-base-ja-v2モデルの初期化
 model = SentenceTransformer('pkshatech/GLuCoSE-base-ja-v2')
 
 # LLM API呼び出し関数
