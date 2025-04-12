@@ -3,26 +3,6 @@ import os
 import openpyxl
 from openpyxl.styles.borders import Border
 
-# Excelファイルから全てのシートのデータを読み取る関数
-def load_data_from_excel(file_path: str) -> dict:
-    """
-    Excelファイルから全てのシートのデータを読み取る関数。
-
-    Args:
-        file_path (str): Excelファイルのパス。
-
-    Returns:
-        dict: シート名をキー、データを値とする辞書。
-    """
-    try:
-        # pandasを使用してExcelファイルを読み込み、全てのシートを辞書形式で取得
-        data = pd.read_excel(file_path, sheet_name=None)  # 全てのシートを読み取る
-        return {sheet: df.values.tolist() for sheet, df in data.items()}
-    except Exception as e:
-        # エラーが発生した場合はエラーメッセージを出力
-        print(f"エラー: Excelファイルの読み取りに失敗しました: {e}")
-        return {}
-
 def remove_empty_columns(table: list) -> list:
     """
     表データから空の列を削除する関数。
@@ -106,7 +86,14 @@ def extract_tables_from_excel(file_path: str) -> dict:
                         current_table = []
                     else:
                         # 表ではない地の文として扱う
-                        markdown_output.append("".join([str(cell.value) if cell.value else "" for cell in row]))
+                        if any(cell.font and cell.font.bold and cell.font.underline for cell in row):
+                            markdown_output.append("## " + "".join([str(cell.value) if cell.value else "" for cell in row]))
+                        elif any(cell.font and cell.font.bold and not cell.font.underline for cell in row):
+                            markdown_output.append("### " + "".join([str(cell.value) if cell.value else "" for cell in row]))
+                        elif any(cell.font and not cell.font.bold and cell.font.underline for cell in row):
+                            markdown_output.append("#### " + "".join([str(cell.value) if cell.value else "" for cell in row]))
+                        else:
+                            markdown_output.append("".join([str(cell.value) if cell.value else "" for cell in row]))
 
             # 最後の表を追加
             if current_table:
@@ -132,30 +119,14 @@ if __name__ == "__main__":
     # サンプルExcelファイルのパス
     sample_file_path = "sample/外部設計書_画面設計（あいうえお）.xlsx"
 
-    # データを読み込む
-    data = load_data_from_excel(sample_file_path)
-
-    # 読み込んだデータを出力
-    output_dir = "output"
-    os.makedirs(output_dir, exist_ok=True)  # 出力ディレクトリを作成
-    output_file_path = os.path.join(output_dir, "output.txt")
-
-    if data:
-        # 読み込んだデータをテキストファイルに書き出し
-        with open(output_file_path, "w", encoding="utf-8") as f:
-            for sheet_name, rows in data.items():
-                f.write(f"シート名: {sheet_name}\n")
-                for row in rows:
-                    f.write(f"{row}\n")
-        print(f"データが {output_file_path} に書き出されました。")
-    else:
-        print("データが読み込めませんでした。")
-
     # 表を抽出
     tables = extract_tables_from_excel(sample_file_path)
 
     # 抽出した表をMarkdown形式で出力
-    output_file_path = os.path.join(output_dir, "tables.md")
+    output_dir = "output"
+    os.makedirs(output_dir, exist_ok=True)  # 出力ディレクトリを作成
+
+    output_file_path = os.path.join(output_dir, "content.md")
 
     if tables:
         with open(output_file_path, "w", encoding="utf-8") as f:
