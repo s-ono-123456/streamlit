@@ -23,8 +23,17 @@
 3. **データ処理**:
    - `excel_utils.py`を使用して、Excelファイルを読み込み、全てのシートのデータをMarkdown形式で処理します。
    - 処理結果を`output/content.md`に書き出します。
-   - `process_sample1.py`を使用して、Markdownファイル（`output/sample1.md`）を読み込み、シート名ごとにデータを分割し、`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`モデルを用いて埋め込みを生成します。
+   - `process_sample1.py`を使用して、Markdownファイル（`output/sample1.md`）を読み込み、シート名ごとにデータを分割し、`pkshatech/GLuCoSE-base-ja-v2`モデルを用いて埋め込みを生成します。
    - 生成した埋め込みは`output/sample1_embeddings.pkl`に保存されます。
+
+## 使用しているモデル
+
+このプロジェクトでは以下の埋め込みモデルを使用しています:
+
+- `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`: Markdownデータの埋め込み生成に使用。
+- `models--pkshatech--GLuCoSE-base-ja-v2`: 日本語テキストの処理に特化したモデルで、ローカルキャッシュに配置して使用可能。
+
+これらのモデルは、Hugging Face Hubから取得可能です.
 
 ## 使用方法
 
@@ -82,7 +91,7 @@
 
 - FAISSインデックスと言語モデルは現在ダミーデータとプレースホルダーを使用しています。本番環境で使用するには、実際の埋め込みデータとモデル統合に置き換えてください。
 - Streamlitアプリを操作する前に、Flaskサーバーが起動していることを確認してください。
-- `models--sentence-transformers--all-MiniLM-L6-v2.zip`はC:\Users\<ユーザー名>\.cache\huggingface\hub配下に配置することでローカルでも動くはずです。
+- `models--pkshatech--GLuCoSE-base-ja-v2.zip`は`C:\Users\<ユーザー名>\.cache\huggingface\hub`配下に配置することでローカルでも動くはずです。
 - 出力ディレクトリ`output/`が存在しない場合、自動的に作成されます。
 
 ## ライセンス
@@ -94,4 +103,4 @@
 - 2025年4月12日: `process_sample1.py` を追加し、Markdownデータの埋め込み生成機能を実装しました。
 - 2025年4月12日: `requirements.txt` に `sentence-transformers` と `sentencepiece` を追加しました。
 - 2025年4月12日: `excel_utils.py`を更新し、Excelデータの読み込み結果を`content.md`に出力するよう変更しました。
-- 2025年4月9日: 初期バージョンのREADMEを作成しました。
+- 2025年4月9日: 初期バージョンのREADMEを作成しました.
