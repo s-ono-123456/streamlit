@@ -2,23 +2,20 @@ import streamlit as st
 import requests
 from typing import List
 import numpy as np
-from faiss_utils import build_faiss_index, search
+import faiss
+import pickle
 from sentence_transformers import SentenceTransformer
-import pandas as pd
-from data_utils import load_data_from_csv
+from faiss_utils import search
 
-# 検索用データの準備
-csv_file_path = "data.csv"  # CSVファイルのパス
-data = load_data_from_csv(csv_file_path)
+# FAISSインデックスを読み込む
+index = faiss.read_index("output/faiss_index.bin")
+
+# 埋め込みデータを読み込む
+with open("output/data.pkl", "rb") as f:
+    data = pickle.load(f)
 
 # all-minilm-L6-v2モデルの初期化
-model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
-
-# データを使ってベクトル化
-data_vectors = model.encode(data)
-
-# FAISSインデックスの構築
-index, _ = build_faiss_index(data_vectors.tolist(), dimension=data_vectors.shape[1])
+model = SentenceTransformer('pkshatech/GLuCoSE-base-ja-v2')
 
 # LLM API呼び出し関数
 def call_llm_api(prompt: str) -> str:
@@ -38,7 +35,7 @@ if query:
     st.write("検索中...")
     # クエリをベクトル化
     query_vector = model.encode([query]).astype('float32')
-    search_results = search(index, query_vector, data)
+    search_results = search(index, query_vector, data, top_k=3)
     st.write("検索結果:", search_results)
 
     # 検索結果をプロンプトに含めてLLMに送信

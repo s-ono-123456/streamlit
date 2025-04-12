@@ -87,11 +87,11 @@ def extract_tables_from_excel(file_path: str) -> dict:
                     else:
                         # 表ではない地の文として扱う
                         if any(cell.font and cell.font.bold and cell.font.underline for cell in row):
-                            markdown_output.append("## " + "".join([str(cell.value) if cell.value else "" for cell in row]))
-                        elif any(cell.font and cell.font.bold and not cell.font.underline for cell in row):
                             markdown_output.append("### " + "".join([str(cell.value) if cell.value else "" for cell in row]))
-                        elif any(cell.font and not cell.font.bold and cell.font.underline for cell in row):
+                        elif any(cell.font and cell.font.bold and not cell.font.underline for cell in row):
                             markdown_output.append("#### " + "".join([str(cell.value) if cell.value else "" for cell in row]))
+                        elif any(cell.font and not cell.font.bold and cell.font.underline for cell in row):
+                            markdown_output.append("##### " + "".join([str(cell.value) if cell.value else "" for cell in row]))
                         else:
                             markdown_output.append("".join([str(cell.value) if cell.value else "" for cell in row]))
 
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     if tables:
         with open(output_file_path, "w", encoding="utf-8") as f:
             for sheet_name, content in tables.items():
-                f.write(f"# シート名: {sheet_name}\n\n")
+                f.write(f"## シート名: {sheet_name}\n\n")
                 f.write(content + "\n\n")
         print(f"表が {output_file_path} に書き出されました。")
     else:

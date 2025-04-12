@@ -7,3 +7,5 @@ requests
 scikit-learn
 pandas
 openpyxl
+sentence-transformers
+sentencepiece
