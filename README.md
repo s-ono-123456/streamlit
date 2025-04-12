@@ -60,11 +60,29 @@
 
 3. ブラウザで`http://localhost:8501`にアクセスして、Streamlitアプリを利用します。
 
+## 新機能
+
+### Excelデータの読み込み
+
+- `excel_utils.py`:
+  - Excelファイルを読み込み、全てのシートのデータを辞書形式で取得するユーティリティ。
+  - 実行時に、読み取ったデータを`output/output.txt`に書き出します。
+
+### 使用方法
+
+1. サンプルExcelファイルを`sample/`ディレクトリに配置します。
+2. 以下のコマンドで`excel_utils.py`を実行します:
+   ```bash
+   python excel_utils.py
+   ```
+3. 結果は`output/output.txt`に保存されます。
+
 ## 注意事項
 
 - FAISSインデックスと言語モデルは現在ダミーデータとプレースホルダーを使用しています。本番環境で使用するには、実際の埋め込みデータとモデル統合に置き換えてください。
 - Streamlitアプリを操作する前に、Flaskサーバーが起動していることを確認してください。
 - `models--sentence-transformers--all-MiniLM-L6-v2.zip`はC:\Users\<ユーザー名>\.cache\huggingface\hub配下に配置することでローカルでも動くはずです。
+- 出力ディレクトリ`output/`が存在しない場合、自動的に作成されます。
 
 ## ライセンス
 
