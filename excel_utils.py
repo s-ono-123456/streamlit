@@ -91,12 +91,16 @@ def extract_tables_from_excel(file_path: str) -> dict:
 
                         # セルの中身に「*_del」「*_add」がある場合、空文字列に設定
                         if any(cell.value and ("_del" in str(cell.value) or "_add" in str(cell.value)) for cell in row):
-                            markdown_output.append("".join(["" if cell.value and ("_del" in str(cell.value) or "_add" in str(cell.value)) else str(cell.value) if cell.value else "" for cell in row]))
+                            line = "".join(["" if cell.value and ("_del" in str(cell.value) or "_add" in str(cell.value)) else str(cell.value) if cell.value else "" for cell in row])
+                            if line.strip():
+                                markdown_output.append(line)
                             continue
 
                         # セルの中身が関数の場合、表示内容を設定
                         if any(callable(cell.value) for cell in row):
-                            markdown_output.append("".join([str(cell.value()) if callable(cell.value) else str(cell.value) if cell.value else "" for cell in row]))
+                            line = "".join([str(cell.value()) if callable(cell.value) else str(cell.value) if cell.value else "" for cell in row])
+                            if line.strip():
+                                markdown_output.append(line)
                             continue
 
                         # フォントスタイルに応じてMarkdown形式のヘッダーを追加
@@ -108,11 +112,15 @@ def extract_tables_from_excel(file_path: str) -> dict:
 
                         for condition, prefix in header_styles:
                             if any(condition(cell) and cell.value for cell in row):
-                                markdown_output.append(prefix + "".join([str(cell.value) if cell.value else "" for cell in row]))
+                                line = prefix + "".join([str(cell.value) if cell.value else "" for cell in row])
+                                if line.strip():
+                                    markdown_output.append(line)
                                 break
                         else:
                             # ヘッダー条件に該当しない場合はそのまま地の文として追加
-                            markdown_output.append("".join([str(cell.value) if cell.value else "" for cell in row]))
+                            line = "".join([str(cell.value) if cell.value else "" for cell in row])
+                            if line.strip():
+                                markdown_output.append(line)
 
             # 最後の表を追加
             if current_table:
