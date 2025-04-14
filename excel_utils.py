@@ -86,13 +86,32 @@ def extract_tables_from_excel(file_path: str) -> dict:
                         current_table = []
                     else:
                         # 表ではない地の文として扱う
-                        if any(cell.font and cell.font.bold and cell.font.underline for cell in row):
-                            markdown_output.append("### " + "".join([str(cell.value) if cell.value else "" for cell in row]))
-                        elif any(cell.font and cell.font.bold and not cell.font.underline for cell in row):
-                            markdown_output.append("#### " + "".join([str(cell.value) if cell.value else "" for cell in row]))
-                        elif any(cell.font and not cell.font.bold and cell.font.underline for cell in row):
-                            markdown_output.append("##### " + "".join([str(cell.value) if cell.value else "" for cell in row]))
+                        if any(cell.font and cell.font.strike and cell.value for cell in row):
+                            continue  # 取り消し線がついている地の文はスキップ
+
+                        # セルの中身に「*_del」「*_add」がある場合、空文字列に設定
+                        if any(cell.value and ("_del" in str(cell.value) or "_add" in str(cell.value)) for cell in row):
+                            markdown_output.append("".join(["" if cell.value and ("_del" in str(cell.value) or "_add" in str(cell.value)) else str(cell.value) if cell.value else "" for cell in row]))
+                            continue
+
+                        # セルの中身が関数の場合、表示内容を設定
+                        if any(callable(cell.value) for cell in row):
+                            markdown_output.append("".join([str(cell.value()) if callable(cell.value) else str(cell.value) if cell.value else "" for cell in row]))
+                            continue
+
+                        # フォントスタイルに応じてMarkdown形式のヘッダーを追加
+                        header_styles = [
+                            (lambda cell: cell.font and cell.font.bold and cell.font.underline, "### "),
+                            (lambda cell: cell.font and cell.font.bold and not cell.font.underline, "#### "),
+                            (lambda cell: cell.font and not cell.font.bold and cell.font.underline, "##### ")
+                        ]
+
+                        for condition, prefix in header_styles:
+                            if any(condition(cell) and cell.value for cell in row):
+                                markdown_output.append(prefix + "".join([str(cell.value) if cell.value else "" for cell in row]))
+                                break
                         else:
+                            # ヘッダー条件に該当しない場合はそのまま地の文として追加
                             markdown_output.append("".join([str(cell.value) if cell.value else "" for cell in row]))
 
             # 最後の表を追加
