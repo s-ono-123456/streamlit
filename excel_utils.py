@@ -39,7 +39,7 @@ def extract_tables_from_excel(file_path: str) -> dict:
         dict: シート名をキー、Markdown形式の表と地の文を値とする辞書。
     """
     try:
-        workbook = openpyxl.load_workbook(file_path)
+        workbook = openpyxl.load_workbook(file_path, data_only=True, read_only=True)
         content = {}
 
         for sheet_name in workbook.sheetnames:
