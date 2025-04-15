@@ -43,6 +43,8 @@ def extract_tables_from_excel(file_path: str) -> dict:
         content = {}
 
         for sheet_name in workbook.sheetnames:
+            if sheet_name in ["改訂履歴", "記載要領"]:
+                continue  # スキップ対象のシート
             sheet = workbook[sheet_name]
             markdown_output = []
             current_table = []
