@@ -79,24 +79,18 @@ def extract_tables_from_excel(file_path: str) -> dict:
 
                         markdown_table = []
                         for i, table_row in enumerate(current_table):
+                            formatted_row = [str(value).replace("\n", "<br />") if value else "" for value in table_row]
                             if i == 0:  # 最初の行がタイトル行の場合
-                                markdown_table.append("| " + " | ".join([str(value) if value else "" for value in table_row]) + " |")
+                                markdown_table.append("| " + " | ".join(formatted_row) + " |")
                                 markdown_table.append("|---" * len(table_row) + "|")  # タイトル行とデータ行の間に区切り線を追加
                             else:
-                                markdown_table.append("| " + " | ".join([str(value) if value else "" for value in table_row]) + " |")
+                                markdown_table.append("| " + " | ".join(formatted_row) + " |")
                         markdown_output.append("\n".join(markdown_table))
                         current_table = []
                     else:
                         # 表ではない地の文として扱う
                         if any(cell.font and cell.font.strike and cell.value for cell in row):
                             continue  # 取り消し線がついている地の文はスキップ
-
-                        # セルの中身に「*_del」「*_add」がある場合、空文字列に設定
-                        if any(cell.value and ("_del" in str(cell.value) or "_add" in str(cell.value)) for cell in row):
-                            line = "".join(["" if cell.value and ("_del" in str(cell.value) or "_add" in str(cell.value)) else str(cell.value) if cell.value else "" for cell in row])
-                            if line.strip():
-                                markdown_output.append(line)
-                            continue
 
                         # セルの中身が関数の場合、表示内容を設定
                         if any(callable(cell.value) for cell in row):
@@ -114,12 +108,23 @@ def extract_tables_from_excel(file_path: str) -> dict:
 
                         for condition, prefix in header_styles:
                             if any(condition(cell) and cell.value for cell in row):
-                                line = prefix + "".join([str(cell.value) if cell.value else "" for cell in row])
+                                line = prefix + "".join([
+                                    str(cell.value).replace("_del", "").replace("_add", "") if cell.value else ""
+                                    for cell in row
+                                ])
                                 if line.strip():
                                     markdown_output.append(line)
                                 break
                         else:
                             # ヘッダー条件に該当しない場合はそのまま地の文として追加
+
+                            # セルの中身に「*_del」「*_add」がある場合、空文字列に設定
+                            if any(cell.value and ("_del" in str(cell.value) or "_add" in str(cell.value)) for cell in row):
+                                line = "".join(["" if cell.value and ("_del" in str(cell.value) or "_add" in str(cell.value)) else str(cell.value) if cell.value else "" for cell in row])
+                                if line.strip():
+                                    markdown_output.append(line)
+                                continue
+
                             line = "".join([str(cell.value) if cell.value else "" for cell in row])
                             if line.strip():
                                 markdown_output.append(line)
@@ -129,11 +134,12 @@ def extract_tables_from_excel(file_path: str) -> dict:
                 current_table = remove_empty_columns(current_table)  # 空の列を削除
                 markdown_table = []
                 for i, table_row in enumerate(current_table):
+                    formatted_row = [str(value).replace("\n", "<br />") if value else "" for value in table_row]
                     if i == 0:
-                        markdown_table.append("| " + " | ".join([str(value) if value else "" for value in table_row]) + " |")
+                        markdown_table.append("| " + " | ".join(formatted_row) + " |")
                         markdown_table.append("|---" * len(table_row) + "|")
                     else:
-                        markdown_table.append("| " + " | ".join([str(value) if value else "" for value in table_row]) + " |")
+                        markdown_table.append("| " + " | ".join(formatted_row) + " |")
                 markdown_output.append("\n".join(markdown_table))
 
             # シートの内容をまとめる
